@@ -1,0 +1,169 @@
+--Script de criação e insert das tabelas dimensões para criar a DW para análise de dados do gastos do Governo do estado do Ceará.
+
+create table data_warehouse.dim_fonte
+(
+id serial primary key,
+codigo varchar,
+descricao varchar
+);
+
+create table data_warehouse.dim_funcao
+(
+id serial primary key,
+codigo varchar,
+descricao varchar
+);
+
+create table data_warehouse.dim_item
+(
+id serial primary key,
+codigo varchar,
+descricao varchar
+);
+
+create table data_warehouse.dim_item_categoria
+(
+id serial primary key,
+codigo varchar,
+descricao varchar
+);
+
+create table data_warehouse.dim_item_elemento
+(
+id serial primary key,
+codigo varchar,
+descricao varchar
+);
+
+create table data_warehouse.dim_item_grupo
+(
+id serial primary key,
+codigo varchar,
+descricao varchar
+);
+
+create table data_warehouse.dim_item_modalidade
+(
+id serial primary key,
+codigo varchar,
+descricao varchar
+);
+
+create table data_warehouse.dim_modalidade_licitacao
+(
+id serial primary key,
+descricao varchar
+);
+
+create table data_warehouse.dim_orgao
+(
+id serial primary key,
+codigo varchar,
+descricao varchar
+);
+
+create table data_warehouse.dim_programa
+(
+id serial primary key,
+codigo varchar,
+descricao varchar
+);
+
+create table data_warehouse.dim_subfuncao
+(
+id serial primary key,
+codigo varchar,
+descricao varchar
+);
+
+create table data_warehouse.dim_tempo
+(
+id serial primary key,
+data date,
+ano int,
+mes_numero int,
+mes_nome varchar,
+mes_abrev varchar,
+dia int
+);
+
+insert into data_warehouse.dim_fonte (codigo, descricao)
+select distinct
+efd.cod_fonte,
+efd.dsc_fonte
+from public.execucao_financeira_despesa efd;
+
+insert into data_warehouse.dim_funcao (codigo, descricao)
+select distinct
+efd.cod_funcao,
+efd.dsc_funcao
+from public.execucao_financeira_despesa efd;
+
+insert into data_warehouse.dim_item (codigo, descricao)
+select distinct
+efd.cod_item,
+efd.dsc_item
+from public.execucao_financeira_despesa efd;
+
+insert into data_warehouse.dim_item_categoria (codigo, descricao)
+select distinct
+efd.cod_item_categoria,
+efd.dsc_item_categoria
+from public.execucao_financeira_despesa efd;
+
+insert into data_warehouse.dim_item_elemento (codigo, descricao)
+select distinct
+efd.cod_item_elemento,
+efd.dsc_item_elemento
+from public.execucao_financeira_despesa efd;
+
+insert into data_warehouse.dim_item_grupo (codigo, descricao)
+select distinct
+efd.cod_item_grupo,
+efd.dsc_item_grupo
+from public.execucao_financeira_despesa efd;
+
+insert into data_warehouse.dim_item_modalidade (codigo, descricao)
+select distinct
+efd.cod_item_modalidade,
+efd.dsc_item_modalidade
+from public.execucao_financeira_despesa efd;
+
+insert into data_warehouse.dim_modalidade_licitacao (descricao)
+select distinct
+efd.dsc_modalidade_licitacao
+from public.execucao_financeira_despesa efd;
+
+insert into data_warehouse.dim_orgao (codigo, descricao)
+select distinct
+efd.codigo_orgao,
+efd.dsc_orgao
+from public.execucao_financeira_despesa efd;
+
+insert into data_warehouse.dim_programa (codigo, descricao)
+select distinct
+efd.cod_programa,
+efd.dsc_programa
+from public.execucao_financeira_despesa efd;
+
+insert into data_warehouse.dim_subfuncao (codigo, descricao)
+select distinct
+efd.cod_subfuncao,
+efd.dsc_subfuncao
+from public.execucao_financeira_despesa efd;
+
+SET lc_time TO 'pt_BR';
+
+INSERT INTO data_warehouse.dim_tempo (data, ano, mes_numero, mes_nome, mes_abrev, dia)
+select distinct
+data,
+EXTRACT(year FROM data) as ano,
+EXTRACT(month FROM data) as mes_numero,
+TO_CHAR(data, 'TMMonth') as mes_nome,
+TO_CHAR(data, 'TMMon') as mes_abrev,
+EXTRACT(day FROM data) as dia
+FROM generate_series(
+'2015-01-01'::date,
+'2025-12-31'::date,
+'1 day'::interval
+) as data;
