@@ -1,0 +1,65 @@
+create table data_warehouse.fato_execucao
+(
+id serial primary key,
+id_fonte int references data_warehouse.dim_fonte(id),
+id_funcao int references data_warehouse.dim_funcao(id),
+id_item int references data_warehouse.dim_item(id),
+id_item_categora int references data_warehouse.dim_item_categoria(id),
+id_item_elemento int references data_warehouse.dim_item_elemento(id),
+id_item_grupo int references data_warehouse.dim_item_grupo(id),
+id_item_modalidade int references data_warehouse.dim_item_modalidade(id),
+id_modalidade_licitacao int references data_warehouse.dim_modalidade_licitacao(id),
+id_orgao int references data_warehouse.dim_orgao(id),
+id_programa int references data_warehouse.dim_programa(id),
+id_subfuncao int references data_warehouse.dim_subfuncao(id),
+cod_np varchar,
+vlr_empenho numeric(18,2),
+vlr_pagamento numeric(18,2),
+id_data_empenho int,
+id_data_pagamento int,
+num_ano_np varchar
+);
+
+insert into data_warehouse.fato_execucao (id_fonte, id_funcao, id_item, id_item_categoria, id_item_elemento, id_item_grupo, id_item_modalidade, id_modalidade_licitacao, id_orgao, id_programa, id_subfuncao, cod_np, id_data_empenho, id_data_pagamento, vlr_empenho, vlr_pagamento, num_ano_np)
+select
+df.id as id_fonte,
+dff.id as id_funcao,
+di.id as id_item,
+dic.id as id_item_categoria,
+die.id as id_item_elemento,
+dig.id as id_item_grupo,
+dim.id as id_item_modalidade,
+dml.id as id_modalidade_descricao,
+do2.id as id_orgao,
+dp.id as id_programa,
+ds.id as id_subfuncao,
+efd.cod_np,
+dt.id as id_data_empenho,
+dt2.id as id_data_pagamento,
+efd.vlr_empenho,
+efd.vlr_pagamento,
+efd.num_ano_np
+from public.execucao_financeira_despesa efd
+left join data_warehouse.dim_fonte df on df.codigo = efd.cod_fonte
+and df.descricao = efd.dsc_fonte
+left join data_warehouse.dim_funcao dff on dff.codigo = efd.cod_funcao
+and dff.descricao = efd.dsc_funcao
+left join data_warehouse.dim_item di on di.codigo = efd.cod_item
+and di.descricao = efd.dsc_item
+left join data_warehouse.dim_item_categoria dic on dic.codigo = efd.cod_item_categoria
+and dic.descricao = efd.dsc_item_categoria
+left join data_warehouse.dim_item_elemento die on die.codigo = efd.cod_item_elemento
+and die.descricao = efd.dsc_item_elemento
+left join data_warehouse.dim_item_grupo dig on dig.codigo = efd.cod_item_grupo
+and dig.descricao = efd.dsc_item_grupo
+left join data_warehouse.dim_item_modalidade dim on dim.codigo = efd.cod_item_modalidade
+and dim.descricao = efd.dsc_item_modalidade
+left join data_warehouse.dim_modalidade_licitacao dml on dml.descricao = efd.dsc_modalidade_licitacao
+left join data_warehouse.dim_orgao do2 on do2.codigo = efd.codigo_orgao
+and do2.descricao = efd.dsc_orgao
+left join data_warehouse.dim_programa dp on dp.codigo = efd.cod_programa
+and dp.descricao = efd.dsc_programa
+left join data_warehouse.dim_subfuncao ds on ds.codigo = efd.cod_subfuncao
+and ds.descricao = efd.dsc_subfuncao
+left join data_warehouse.dim_tempo dt on dt."data" = efd.dth_empenho
+left join data_warehouse.dim_tempo dt2 on dt2."data" = efd.dth_pagamento;
